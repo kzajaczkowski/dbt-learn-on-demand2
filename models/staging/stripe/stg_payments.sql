@@ -1,2 +1,3 @@
-select *
-from raw.stripe.payments
+select orderid
+   , amount
+from raw.stripe.payment
