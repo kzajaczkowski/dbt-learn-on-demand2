@@ -2,14 +2,18 @@ version: 2
 
 models:
   - name: stg_customers
+    description: "Staging table for customers"
     columns: 
       - name: customer_id
+        description: "Unique identifier of customer"
         tests:
           - unique
           - not_null
   - name: stg_orders
+    description: "Orders"
     columns: 
       - name: status
+        description: "{{ doc('order_status') }}"
         tests:
           - accepted_values:
               values:
@@ -19,6 +23,7 @@ models:
                 - placed
                 - return_pending
       - name: customer_id
+        description: "Customer id"
         tests:
           - relationships:
               to: ref('stg_customers')
