@@ -29,6 +29,7 @@ customer_orders as (
 final as (
 
     select
+        {{ dbt_utils.surrogate_key(['customer_id']) }} as customer_sk,
         customers.customer_id,
         customers.first_name,
         customers.last_name,

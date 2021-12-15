@@ -17,7 +17,8 @@ successful_payments as (
     where status = 'success'
 )
 
-select orders.customer_id
+select {{ dbt_utils.surrogate_key(['customer_id']) }} as customer_sk
+   , orders.customer_id
    , orders.order_id
    , orders.order_date
    , successful_payments.amount
