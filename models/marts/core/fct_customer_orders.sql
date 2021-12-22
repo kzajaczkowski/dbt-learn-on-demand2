@@ -18,7 +18,7 @@ customers as (
 payment as (
 
     select *
-    from {{ source('stripe', 'payment') }}
+    from {{ ref('stg_stripe__payment') }}
 
 ),
 
