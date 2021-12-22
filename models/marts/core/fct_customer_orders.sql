@@ -50,12 +50,13 @@ paid_orders as (
     on orders.id = p.order_id
     left join customers c
     on orders.user_id = c.id
+
 ),
 
 customer_orders as (
 
     select c.id as customer_id,
-        min(order_date) as first_order_date,
+        min(order_date) as fdos,
         max(order_date) as most_recent_order_date,
         count(orders.id) as number_of_orders
     from customers c 
@@ -85,11 +86,11 @@ final as (
         row_number() over (order by p.order_id) as transaction_seq,
         row_number() over (partition by customer_id order by p.order_id)
             as customer_sales_seq,
-        case when c.first_order_date = p.order_placed_at
+        case when c.fdos = p.order_placed_at
             then 'new'
             else 'return' end as nvsr,
         x.customer_lifetime_value,
-        c.first_order_date as fdos
+        c.fdos
     from paid_orders p
     left join customer_orders c
     using (customer_id)
