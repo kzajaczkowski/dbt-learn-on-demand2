@@ -4,14 +4,14 @@ with
 orders as (
 
     select *
-    from {{ source('jaffle_shop', 'orders') }}
+    from {{ ref('stg_jaffle_shop__orders') }}
 
 ),
 
 customers as (
 
     select *
-    from {{ source('jaffle_shop', 'customers') }}
+    from {{ ref('stg_jaffle_shop__customers') }}
 
 ),
 
@@ -37,31 +37,31 @@ successful_payments as (
 
 paid_orders as (
     
-    select  orders.id as order_id,
-            orders.user_id	as customer_id,
-            orders.order_date as order_placed_at,
-            orders.status as order_status,
+    select  orders.order_id,
+            orders.customer_id,
+            orders.order_placed_at,
+            orders.order_status,
             p.total_amount_paid,
             p.payment_finalized_date,
-            c.first_name as customer_first_name,
-            c.last_name as customer_last_name
+            c.customer_first_name,
+            c.customer_last_name
     from orders
     left join successful_payments p
-    on orders.id = p.order_id
+    using (order_id)
     left join customers c
-    on orders.user_id = c.id
+    using (customer_id)
 
 ),
 
 customer_orders as (
 
-    select c.id as customer_id,
-        min(order_date) as fdos,
-        max(order_date) as most_recent_order_date,
-        count(orders.id) as number_of_orders
+    select c.customer_id,
+        min(order_placed_at) as fdos,
+        max(order_placed_at) as most_recent_order_date,
+        count(orders.order_id) as number_of_orders
     from customers c 
     left join orders
-    on orders.user_id = c.id 
+    using (customer_id)
     group by 1
 
 ),
