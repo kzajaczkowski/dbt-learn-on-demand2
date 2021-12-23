@@ -23,12 +23,11 @@ payment as (
 ),
 
 -- logical CTE's
+order_totals as (
 
-successful_payments as (
-
-    select orderid as order_id,
+    select order_id,
         max(created) as payment_finalized_date,
-        sum(amount) / 100.0 as total_amount_paid
+        sum(amount) as total_amount_paid
     from payment
     where status <> 'fail'
     group by 1
@@ -46,7 +45,7 @@ paid_orders as (
             c.customer_first_name,
             c.customer_last_name
     from orders
-    left join successful_payments p
+    left join order_totals p
     using (order_id)
     left join customers c
     using (customer_id)
