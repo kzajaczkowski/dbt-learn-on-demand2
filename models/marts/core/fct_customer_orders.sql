@@ -34,12 +34,9 @@ order_totals as (
 
 ),
 
-paid_orders as (
+order_values_joined as (
     
-    select  orders.order_id,
-            orders.customer_id,
-            orders.order_placed_at,
-            orders.order_status,
+    select  orders.*,
             p.total_amount_paid,
             p.payment_finalized_date,
             c.customer_first_name,
@@ -69,8 +66,8 @@ customer_lifetime_value as (
     select
         p.order_id,
         sum(orders_atd.total_amount_paid) as customer_lifetime_value
-    from paid_orders p
-    left join paid_orders orders_atd
+    from order_values_joined p
+    left join order_values_joined orders_atd
     on p.customer_id = orders_atd.customer_id
     and p.order_id >= orders_atd.order_id
     group by 1
@@ -90,7 +87,7 @@ final as (
             else 'return' end as nvsr,
         x.customer_lifetime_value,
         c.fdos
-    from paid_orders p
+    from order_values_joined p
     left join customer_orders c
     using (customer_id)
     left outer join customer_lifetime_value x
