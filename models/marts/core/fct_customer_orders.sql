@@ -49,33 +49,26 @@ order_values_joined as (
 
 ),
 
-customer_orders as (
-
-    select customers.customer_id,
-        min(orders.order_placed_at) as first_customer_order,
-        max(orders.order_placed_at) as last_customer_order,
-        count(orders.order_id) as number_of_orders
-    from customers
-    left join orders
-    using (customer_id)
-    group by 1
-
-),
-
 final as (
 
     select
         order_values_joined.*,
-        case when customer_orders.first_customer_order = order_values_joined.order_placed_at
-            then 'new'
-            else 'return' end as nvsr,
-        sum(order_values_joined.total_amount_paid) over
-            (partition by order_values_joined.customer_id order by order_placed_at)
-            as customer_lifetime_value,
-        customer_orders.first_customer_order as fdos
+        case
+            when row_number() over (
+                    partition by order_values_joined.customer_id
+                    order by order_values_joined.order_placed_at asc
+                ) = 1
+                then 'new'
+            else 'return'
+            end as nvsr,
+        sum(order_values_joined.total_amount_paid) over (
+            partition by order_values_joined.customer_id 
+            order by order_placed_at
+            ) as customer_lifetime_value,
+        first_value(order_values_joined.order_placed_at) over (
+            partition by order_values_joined.customer_id
+            order by order_values_joined.order_placed_at) as fdos
     from order_values_joined
-    left join customer_orders
-    using (customer_id)
 )
 
 select *
