@@ -69,19 +69,6 @@ customer_orders as (
 
 ),
 
-customer_lifetime_value as (
-    select
-        p.order_id,
-        sum(orders_atd.total_amount_paid) as customer_lifetime_value
-    from order_values_joined p
-    left join order_values_joined orders_atd
-    on p.customer_id = orders_atd.customer_id
-    and p.order_id >= orders_atd.order_id
-    group by 1
-    order by p.order_id
-
-),
-
 final as (
 
     select
@@ -89,14 +76,11 @@ final as (
         case when c.first_customer_order = p.order_placed_at
             then 'new'
             else 'return' end as nvsr,
-        x.customer_lifetime_value,
+        sum(p.total_amount_paid) over (partition by p.customer_id order by order_placed_at) as customer_lifetime_value,
         c.first_customer_order as fdos
     from order_values_joined p
     left join customer_orders c
     using (customer_id)
-    left outer join customer_lifetime_value x
-    on x.order_id = p.order_id
-
 )
 
 select *
