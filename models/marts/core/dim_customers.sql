@@ -1,12 +1,28 @@
-with customers as (
+with jaffle_shop_customers as (
 
     select * from {{ ref('stg_customers')}}
+
+),
+
+legacy_customers as (
+
+    select * from {{ ref('stg_legacy_customers') }}
 
 ),
 
 orders as (
 
     select * from {{ ref('fct_orders') }}
+
+),
+
+unioned_customers as (
+
+    select * from jaffle_shop_customers
+    
+    union all
+
+    select * from legacy_customers
 
 ),
 
@@ -33,12 +49,13 @@ final as (
         customers.customer_id,
         customers.first_name,
         customers.last_name,
+        customers.source_system,
         customer_orders.first_order_date,
         customer_orders.most_recent_order_date,
         coalesce(customer_orders.number_of_orders, 0) as number_of_orders,
         coalesce(customer_orders.lifetime_value, 0) as lifetime_value
 
-    from customers
+    from unioned_customers
 
     left join customer_orders using (customer_id)
 
