@@ -1,6 +1,6 @@
 with jaffle_shop_customers as (
 
-    select * from {{ ref('stg_customers')}}
+    select * from {{ ref('stg_customers') }}
 
 ),
 
@@ -46,10 +46,10 @@ final as (
 
     select
         {{ dbt_utils.surrogate_key(['customer_id']) }} as customer_sk,
-        customers.customer_id,
-        customers.first_name,
-        customers.last_name,
-        customers.source_system,
+        unioned_customers.customer_id,
+        unioned_customers.first_name,
+        unioned_customers.last_name,
+        unioned_customers.source_system,
         customer_orders.first_order_date,
         customer_orders.most_recent_order_date,
         coalesce(customer_orders.number_of_orders, 0) as number_of_orders,
