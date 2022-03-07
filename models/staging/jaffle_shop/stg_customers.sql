@@ -7,7 +7,9 @@ select
 
     1 AS NewColumn1,
 
-    'jaffle_shop' as source_system
+    'jaffle_shop' as source_system,
+
+    null as is_special_customer
 
 from {{ source('jaffle_shop', 'customers') }}
 

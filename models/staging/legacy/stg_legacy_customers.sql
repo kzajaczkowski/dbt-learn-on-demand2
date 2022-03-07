@@ -5,7 +5,8 @@ select
 
     1 AS NewColumn1,
 
-    'legacy' as source_system
+    'legacy' as source_system,
+    'N' as is_special_customer
 
 from {{ ref('legacy_customers') }}
 
