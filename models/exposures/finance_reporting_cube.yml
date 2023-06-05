@@ -1,0 +1,18 @@
+version: 2
+
+exposures:
+
+  - name: finance_reporting_cube
+    label: OLAP Cube for Financial Reporting
+    type: application
+    maturity: low
+    url: https://olap/frc
+    description: >
+      Multidimensional model for financial reporting
+
+    depends_on:
+      - ref('dim_customers_with_orders')
+
+    owner:
+      name: John Kowalski
+      email: john@alchemiadanych.onmicrosoft.com
