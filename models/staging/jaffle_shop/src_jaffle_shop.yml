@@ -4,9 +4,13 @@ sources:
   - name: jaffle_shop
     description: A clone of a Postgres application database.
     database: raw
+    freshness:
+      warn_after: {count: 12, period: day}
+    loaded_at_field: _ETL_LOADED_AT
     tables:
       - name: customers
         description: Raw customers data.
+        freshness: null
         columns:
           - name: id
             description: Primary key for customers
